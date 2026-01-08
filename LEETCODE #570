@@ -1,0 +1,3 @@
+LEET CODE HOME WORK
+
+select name from Employee where id in(select managerid from Employee group by managerId having count(*)>=5);
