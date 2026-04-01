@@ -1,0 +1,42 @@
+create or replace procedure update_salary_proc(IN P_EMP_ID INT,INOUT P_SALARY NUMERIC(20,3),OUT STATUS VARCHAR(20))
+	AS
+	$$
+	DECLARE
+	CURR_SAL NUMERIC(20,3);
+	BEGIN
+
+	SELECT SALARY+P_SALARY INTO CURR_SAL FROM employees WHERE EMP_ID=P_EMP_ID;
+	IF NOT FOUND THEN
+	RAISE EXCEPTION 'EMPLOYEE NOT FOUND';
+	END IF;
+
+	UPDATE employees
+	set salary= curr_sal
+	where emp_id=p_emp_id;
+
+	P_salary:=curr_sal;
+	status:='SUCCESS';
+
+	EXCEPTION
+	WHEN OTHERS THEN 
+	IF SQLERRM LIKE '%EMPLOYEE NOT FOUND%' THEN
+	STATUS:= 'EMPLOYEE NOT FOUND';
+	END IF;
+
+	END;
+	
+	$$ LANGUAGE PLPGSQL;
+
+SELECT * FROM EMPLOYEES
+
+	DO
+	$$
+	DECLARE
+	EMP_ID INT:=1;
+	STATUS VARCHAR(20);
+	SALARY NUMERIC(20,3):=500;
+	BEGIN
+	CALL update_salary_proc(Emp_id,salary,status);
+	RAISE NOTICE 'YOUR STATUS IS % AND YOUR UPDATED SALARY IS  %',STATUS,salary;
+	END;
+	$$
